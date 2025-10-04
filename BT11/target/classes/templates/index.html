@@ -1,56 +1,48 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Product Manager</title>
+    <title>Trang chủ</title>
 </head>
 <body>
-<div align="center">
-    <div sec:authorize="isAuthenticated()">
-        Welcome <b><span sec:authentication="name">Username</span></b>
-        &nbsp;
-        <i><span sec:authentication="principal.authorities">Roles</span></i>
-    </div>
+<h2>🏠 Welcome!</h2>
 
-    <form th:action="@{/logout}" method="post">
-        <input type="submit" value="Logout" />
+<!-- Khi người dùng đã đăng nhập -->
+<div sec:authorize="isAuthenticated()">
+    <p>
+        Xin chào <b sec:authentication="name"></b> |
+        Quyền của bạn: <span sec:authentication="principal.authorities"></span>
+    </p>
+
+    <!-- Form logout đúng chuẩn (có CSRF) -->
+    <form th:action="@{/logout}" method="post" style="display:inline">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <button type="submit">Đăng xuất</button>
     </form>
-
-    <h1>Product Manager</h1>
-    <div sec:authorize="hasAnyAuthority('CREATOR', 'ADMIN')">
-        <a href="new">Create New Product</a>
-    </div>
-
-    <br/><br/>
-    <table border="1" cellpadding="10">
-        <thead>
-        <tr>
-            <th>Product ID</th>
-            <th>Name</th>
-            <th>Brand</th>
-            <th>Made In</th>
-            <th>Price</th>
-            <th sec:authorize="hasAnyAuthority('ADMIN', 'EDITOR')">Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="product : ${listProducts}">
-            <td th:text="${product.id}">Product ID</td>
-            <td th:text="${product.name}">Name</td>
-            <td th:text="${product.brand}">Brand</td>
-            <td th:text="${product.madein}">Made in</td>
-            <td th:text="${product.price}">Price</td>
-
-            <td sec:authorize="hasAnyAuthority('ADMIN', 'EDITOR')">
-                <a th:href="@{'/edit/' + ${product.id}}">Edit</a>
-                &nbsp;&nbsp;&nbsp;
-                <a sec:authorize="hasAuthority('ADMIN')" 
-                   th:href="@{'/delete/' + ${product.id}}">Delete</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
 </div>
+
+<!-- Khi người dùng chưa đăng nhập -->
+<div sec:authorize="isAnonymous()">
+    <a th:href="@{/login}">Đăng nhập</a>
+</div>
+
+<hr>
+
+<!-- Khu vực riêng cho admin -->
+<div sec:authorize="hasRole('ADMIN')">
+    <h3>🔧 Quản lý sản phẩm</h3>
+    <a th:href="@{/products}">Xem danh sách sản phẩm</a>
+</div>
+
+<!-- Khu vực dành cho user thông thường -->
+<div sec:authorize="hasRole('USER')">
+    <h3>👤 Khu vực người dùng</h3>
+    <p>Bạn đang đăng nhập với quyền USER.</p>
+</div>
+
+<hr>
+<p><i>Spring Security 6 + Thymeleaf Demo</i></p>
+
 </body>
 </html>
