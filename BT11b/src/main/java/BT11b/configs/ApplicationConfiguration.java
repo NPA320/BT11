@@ -1,53 +1,40 @@
+// BT11b/configs/ApplicationConfiguration.java (hoặc trong SecurityConfiguration)
 package BT11b.configs;
 
+import BT11b.services.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.*;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import BT11b.repository.UserRepository;
 
 @Configuration
 public class ApplicationConfiguration {
 
-    private final UserRepository userRepository;
+    private final CustomUserDetailsService userDetailsService;
 
-    public ApplicationConfiguration(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public ApplicationConfiguration(CustomUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 
-    // Định nghĩa cách load User từ DB
     @Bean
-    UserDetailsService userDetailsService() {
-        return username -> userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService); // trả về chính User entity
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
     }
 
-    // Password encoder (BCrypt)
     @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    // AuthenticationManager
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+            throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // AuthenticationProvider (sử dụng UserDetailsService + PasswordEncoder)
     @Bean
-    AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // khớp chuỗi bcrypt trong DB
     }
 }
-

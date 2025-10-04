@@ -2,21 +2,9 @@ package BT11b.configs;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.LockedException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.CredentialsExpiredException;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.core.AuthenticationException;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.security.SignatureException;
-import org.springframework.security.web.authentication.session.SessionAuthenticationException;
-import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderNotFoundException;
+import org.springframework.security.authentication.AccountStatusException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
